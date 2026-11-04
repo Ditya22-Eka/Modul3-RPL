@@ -1,4 +1,4 @@
-#Aditya_019
+# Aditya_019
 import tkinter.messagebox as messagebox
 from models.buku_model import BukuModel
 from views.buku_view import BukuView
@@ -6,23 +6,21 @@ from views.buku_view import BukuView
 
 class BukuController:
     def __init__(self, user_role="anggota"):
-        # Simpan role pengguna yang login
         self.user_role = user_role
-
-        # Inisialisasi Model dan View
         self.model = BukuModel()
         self.view = BukuView()
-
-        # Menampilkan informasi role pada judul jendela aplikasi
-        self.view.title(f"Sistem Manajemen Perpustakaan - Mode: {self.user_role.upper()}")
 
         # Menyimpan id_buku dari baris yang sedang dipilih
         self.id_terpilih = None
 
-        # Binding (mengikat) tombol di View dengan fungsi di Controller
+        # Menampilkan informasi role pada judul jendela aplikasi
+        self.view.title(f"Sistem Manajemen Perpustakaan - Mode: {self.user_role.upper()}")
+
+        # Binding tombol di View dengan fungsi di Controller
         self.view.btn_simpan.configure(command=self.simpan_data)
         self.view.btn_update.configure(command=self.update_data)
         self.view.btn_hapus.configure(command=self.hapus_data)
+        self.view.btn_logout.configure(command=self.logout)
 
         # Binding klik baris tabel
         self.view.tabel.bind("<<TreeviewSelect>>", self.pilih_baris)
@@ -36,28 +34,23 @@ class BukuController:
             self.view.entry_penulis.configure(state="disabled")
             self.view.entry_tahun.configure(state="disabled")
 
-        # Memuat data ke tabel saat aplikasi pertama kali dibuka
         self.muat_data_tabel()
 
     def muat_data_tabel(self):
-        # Mengosongkan isi tabel di View terlebih dahulu
         for item in self.view.tabel.get_children():
             self.view.tabel.delete(item)
-
-        # Mengambil data dari Model (database)
         data_buku = self.model.get_all_buku()
-
-         # Memasukkan data baru ke dalam tabel View
         for buku in data_buku:
-            self.view.tabel.insert("", "end", values=(buku['id_buku'], buku['judul'], buku['penulis'], buku['tahun_terbit']))
-
+            self.view.tabel.insert(
+                "", "end",
+                values=(buku['id_buku'], buku['judul'], buku['penulis'], buku['tahun_terbit'])
+            )
 
     def bersihkan_form(self):
         self.view.entry_judul.delete(0, 'end')
         self.view.entry_penulis.delete(0, 'end')
         self.view.entry_tahun.delete(0, 'end')
         self.id_terpilih = None
-        # Hilangkan highlight di tabel
         self.view.tabel.selection_remove(self.view.tabel.selection())
 
     def pilih_baris(self, event):
@@ -79,9 +72,9 @@ class BukuController:
 
         self.view.entry_tahun.delete(0, 'end')
         self.view.entry_tahun.insert(0, nilai[3])
-        
+
     def simpan_data(self):
-         # Proteksi ganda di level controller
+        # Proteksi ganda di level controller
         if self.user_role != "admin":
             messagebox.showerror("Akses Ditolak", "Anda tidak memiliki izin untuk menambah data!")
             return
@@ -114,7 +107,7 @@ class BukuController:
         judul = self.view.entry_judul.get()
         penulis = self.view.entry_penulis.get()
         tahun = self.view.entry_tahun.get()
-        
+
         if not judul or not penulis or not tahun:
             messagebox.showwarning("Peringatan", "Semua kolom form harus diisi!")
             return
